@@ -16,7 +16,7 @@ API umożliwiające wynajem gier wideo między użytkownikami. Pozwala na rejest
 
 1. **Sklonuj repozytorium**
    ```sh
-   git clone https://github.com/twoje-repo/game-rental-api.git
+   git clone https://github.com/kaszkietow/ShareYourGame.git
    cd game-rental-api
    ```
 
@@ -183,6 +183,17 @@ class Rental(db.Model):
     total_price = db.Column(db.Float, nullable=False)
     status = db.Column(db.String(20), default="pending")
 ```
+### 💰 Model `Payment` (jeszcze nie obslugiwany)
+```
+class Payment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    rental_id = db.Column(db.Integer, db.ForeignKey('rental.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    status = db.Column(db.String(20), default="pending")  # pending, completed, failed
+    payment_date = db.Column(db.DateTime, default=datetime.utcnow)
+```
+
 
 ## 🔥 Przyszłe funkcjonalności
 
@@ -191,7 +202,3 @@ class Rental(db.Model):
 - Recenzje i oceny gier
 - System wiadomości między użytkownikami
 
-## 👨‍💻 Autor
-
-**Twoje Imię i Nazwisko**  
-[GitHub](https://github.com/twoje-github) | [LinkedIn](https://linkedin.com/in/twoje-linkedin)
