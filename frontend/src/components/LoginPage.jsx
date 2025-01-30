@@ -51,8 +51,9 @@ const LoginPage = () => {
       height="95vh"
       justifyContent="center"
       alignItems="center"
+
     >
-      <Card.Root width={{ base: "80vw", md: "70vw" }} shadow={"2lg"} bg={useColorModeValue("gray.700", "gray.750")} color={"white"}>
+      <Card.Root width={{ base: "80vw", md: "70vw" }}  shadow={"inner"} bg={useColorModeValue("gray.700", "gray.750")} color={"white"}>
         {/* Główna karta logowania */}
         <Card.Header>
           <Text

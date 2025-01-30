@@ -89,8 +89,9 @@ const RegisterPage = () => {
             height="95vh"
             justifyContent="center"
             alignItems="center"
+            shadow={"xl"}
         >
-            <Card.Root width={{ base: "80vw", md: "70vw" }} bg={useColorModeValue("gray.700", "gray.750")} color={"white"}>
+            <Card.Root width={{ base: "80vw", md: "70vw" }} shadow={"inner"}  bg={useColorModeValue("gray.700", "gray.750")} color={"white"}>
                 <Card.Header>
                     <Text
                         textStyle={{ base: "2xl", md: "4xl" }}
