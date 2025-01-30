@@ -26,15 +26,14 @@ import {
 
 const RegisterPage = () => {
     const navigate = useNavigate();
-    const [username, setUsername] = useState(""); // Stan dla nazwy użytkownika
-    const [password, setPassword] = useState(""); // Stan dla hasła
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
     const [gender, setGender] = useState("");
     const [location, setLocation] = useState("");
 
     const handleCreateUser = async (e) => {
     e.preventDefault();
 
-    // Walidacja po stronie klienta
     if (!username.trim()) {
         alert("Username is required.");
         return;
@@ -54,7 +53,7 @@ const RegisterPage = () => {
         const response = await fetch(BASE_URL + "/api/register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, password, gender, location }), // Wysyłamy dane użytkownika
+            body: JSON.stringify({ username, password, gender, location }),
 
         });
 
@@ -79,7 +78,7 @@ const RegisterPage = () => {
             justifyContent="center"
             alignItems="center"
         >
-            <Card.Root width={{ base: "80vw", md: "70vw" }} bg={useColorModeValue("gray.700", "gray.750")} color={"white"}> {/* Ustawienie szerokości na 50% widoku */}
+            <Card.Root width={{ base: "80vw", md: "70vw" }} bg={useColorModeValue("gray.700", "gray.750")} color={"white"}>
                 <Card.Header>
                     <Text
                         textStyle={{ base: "2xl", md: "4xl" }}

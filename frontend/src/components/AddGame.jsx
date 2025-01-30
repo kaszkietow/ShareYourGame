@@ -68,11 +68,8 @@ const AddGame = ({ setGames }) => {
     return;
   }
 
-  // Łączenie inputs i owner_id w jeden obiekt
   const gameData = { ...inputs, owner_id, price_per_day };
 
-  // Dodanie logowania do konsoli, aby sprawdzić, co wysyłasz
-  console.log('Sending game data to server:', gameData);
 
   try {
     const res = await fetch(BASE_URL+"/api/games", {
@@ -81,7 +78,7 @@ const AddGame = ({ setGames }) => {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(gameData),  // Wysyłanie połączonych danych
+      body: JSON.stringify(gameData),
     });
 
     const data = await res.json();

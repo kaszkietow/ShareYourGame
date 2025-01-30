@@ -35,7 +35,7 @@ const EditUser = ({ setUsers, user }) => {
   try {
     if (token) {
       const decodedToken = jwtDecode(token);
-      currentUser = decodedToken.sub.username; // Zalecany użytkownik (admin)
+      currentUser = decodedToken.sub.username;
     }
   } catch (error) {
     console.error("Error decoding token:", error);
@@ -67,7 +67,7 @@ const EditUser = ({ setUsers, user }) => {
         description: "User updated successfully.",
         duration: 4000,
       });
-      window.location.reload(); // Przeładowanie strony po edytowaniu
+      window.location.reload();
       setIsOpen(false);
     } catch (error) {
       toaster.error({
@@ -94,13 +94,12 @@ const EditUser = ({ setUsers, user }) => {
           </DialogHeader>
           <DialogBody pb="4">
             <Stack gap="4">
-              {/* Sprawdzamy, czy to admin edytuje swojego użytkownika */}
               {(isAdmin && !isCurrentUser) || !isAdmin ? (
                 <Field label="Username">
                   <Input
                     value={inputs.username}
                     onChange={(e) => setInputs({ ...inputs, username: e.target.value })}
-                    disabled={isAdmin && isCurrentUser} // Wyłączamy edytowanie "username" dla admina, który edytuje siebie
+                    disabled={isAdmin && isCurrentUser}
                   />
                 </Field>
               ) : null}

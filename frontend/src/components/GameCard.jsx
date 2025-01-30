@@ -35,7 +35,7 @@ const GameCard = ({ game, user, setGames }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleDeleteGame = async (event) => {
-    event.stopPropagation(); // Zatrzymaj propagację zdarzenia
+    event.stopPropagation();
     const token = localStorage.getItem("token");
     try {
       const res = await fetch(BASE_URL + "/api/games/" + game.id, {
@@ -67,7 +67,6 @@ const GameCard = ({ game, user, setGames }) => {
   const cardDisabled = (!isOwner && !isAdmin) && game.available === "false";
 
   const handleCardClick = (event) => {
-    // Sprawdź, czy kliknięto na element z klasą prevent-dialog-click
     if (event.target.closest(".prevent-dialog-click")) {
       return;
     }
@@ -78,10 +77,10 @@ const GameCard = ({ game, user, setGames }) => {
     <>
       {/* Klikalny Card */}
       <Box
-        onClick={handleCardClick} // Otwieramy Dialog po kliknięciu na Box, ale nie na przyciski
+        onClick={handleCardClick}
         width="100%"
         textAlign="left"
-        _hover={{ transform: "scale(1.02)", transition: "transform 0.2s" }} // Efekt hover
+        _hover={{ transform: "scale(1.02)", transition: "transform 0.2s" }}
       >
         <Card.Root
           color={"white"}
@@ -120,17 +119,14 @@ const GameCard = ({ game, user, setGames }) => {
             </Flex>
           </Card.Body>
           <Card.Footer gap="2">
-            {/* Zatrzymaj propagację dla MakeRental */}
             <Box onClick={(e) => e.stopPropagation()}>
               <MakeRental game={game} currentUser={currentUser} user={user} />
             </Box>
             {(isOwner || isAdmin) && (
               <>
-                {/* Zatrzymaj propagację dla EditGame */}
                 <Box onClick={(e) => e.stopPropagation()}>
                   <EditGame game={game} setGames={setGames} />
                 </Box>
-                {/* Zatrzymaj propagację dla przycisku Delete */}
                 <Button
                   variant="outline"
                   colorPalette={"red"}
@@ -145,7 +141,6 @@ const GameCard = ({ game, user, setGames }) => {
         </Card.Root>
       </Box>
 
-      {/* Dialog z dodatkowymi informacjami o grze */}
       <DialogRoot open={isOpen} onOpenChange={setIsOpen} size="xl">
         <DialogContent
           bg={useColorModeValue("teal.950", "gray.950")}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from "./Navbar.jsx";
 import {Button, Container, Flex, Heading, Highlight, Table, Text} from "@chakra-ui/react";
-import { BASE_URL } from "./GamesGrid.jsx"; // Zakładam, że masz plik z BASE_URL
+import { BASE_URL } from "./GamesGrid.jsx";
 import { toaster } from "./ui/toaster.jsx";
 import {useColorModeValue} from "./ui/color-mode.jsx";
 import {Avatar} from "./ui/avatar.jsx";
@@ -75,15 +75,12 @@ const UsersList = (user) => {
             },
         });
 
-        // Sprawdzamy, czy odpowiedź jest poprawna
         if (!res.ok) {
             throw new Error("Failed to delete user");
         }
 
-        // Usuwamy użytkownika z lokalnego stanu
         setUsers((prevUsers) => prevUsers.filter((u) => u.id !== user.id));
 
-        // Pokaż komunikat o sukcesie
         toaster.success({
             title: "Success",
             description: "User and their games deleted successfully.",
@@ -91,14 +88,12 @@ const UsersList = (user) => {
         });
 
     } catch (error) {
-        // Obsługa błędu
         toaster.error({
             title: "Error",
             description: error.message,
             duration: 4000,
         });
     } finally {
-        // Wyłączamy loading
         setIsLoading(false);
     }
 };
@@ -128,7 +123,7 @@ const UsersList = (user) => {
                         <Table.ColumnHeader color={"white"}>Username</Table.ColumnHeader>
                         <Table.ColumnHeader color={"white"}>Gender</Table.ColumnHeader>
                         <Table.ColumnHeader color={"white"}>Location</Table.ColumnHeader>
-                        <Table.ColumnHeader color={"white"}>Owned Games</Table.ColumnHeader> {/* Nowa kolumna */}
+                        <Table.ColumnHeader color={"white"}>Owned Games</Table.ColumnHeader>
                         <Table.ColumnHeader color={"white"}>Actions</Table.ColumnHeader>
                     </Table.Row>
                 </Table.Header>
@@ -159,7 +154,6 @@ const UsersList = (user) => {
                             <Table.Cell gap={2}>
                               <EditUser setUsers={setUsers} user={user} />
 
-                              {/* Ukrywamy przycisk usuwania dla adminów */}
                               {user.username !== "admin" && (
                                 <Button
                                   variant="outline"

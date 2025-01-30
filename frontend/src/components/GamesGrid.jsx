@@ -52,7 +52,6 @@ console.log(games);
                     gap={6}
                 >
                     {games.map((game) => {
-                        // Find the user associated with the game
                         const user = users.find(user => user.id === game.owner_id);
                         return (
                             <GameCard key={game.id} game={game} setGames={setGames} user={user} />

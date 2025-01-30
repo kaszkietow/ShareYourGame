@@ -70,7 +70,7 @@ class Rental(db.Model):
     start_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     end_date = db.Column(db.DateTime, nullable=False)
     total_price = db.Column(db.Float, nullable=False)
-    status = db.Column(db.String(20), default="pending")  # pending, active, completed, cancelled
+    status = db.Column(db.String(20), default="pending")
     payment = db.relationship('Payment', backref='rental', lazy=True, uselist=False)
 
     def to_json_rental(self):

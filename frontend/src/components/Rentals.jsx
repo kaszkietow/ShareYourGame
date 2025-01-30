@@ -31,7 +31,7 @@ const Rentals = () => {
 
                 const data = await response.json();
                 setRentals(data.rentals);
-                setCurrentUser(data.user); // Ustawienie danych bieżącego użytkownika
+                setCurrentUser(data.user);
                 toaster.success({
                     title: "Yeas🚀",
                     description: "Udało się pobrać twoje dane.",

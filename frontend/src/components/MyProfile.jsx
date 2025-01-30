@@ -9,17 +9,6 @@ const MyProfile = (setGames, game) => {
     const location = useLocation();
     const currentUser = location.state?.currentUser;
 
-    console.log("Received currentUser in MyProfile:", currentUser);
-
-    // if (!currentUser) {
-    //     return <div>Loading user data...</div>;
-    // }
-    //
-    // if (!Array.isArray(currentUser.cars) || currentUser.cars.length === 0) {
-    //     return <div>No cars available for this user.</div>;
-    // }
-
-    // Renderowanie tabeli samochodów
     return (
         <Container maxW="container.xl">
             <Navbar/>

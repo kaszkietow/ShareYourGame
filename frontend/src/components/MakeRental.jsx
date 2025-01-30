@@ -39,10 +39,7 @@ const MakeRental = ({ game, currentUser }) => {
             body: JSON.stringify(gameData),
         });
 
-        console.log("Response status:", response.status); // Logowanie statusu odpowiedzi
         const data = await response.json();
-        console.log("Response data:", data); // Logowanie danych odpowiedzi
-
         if (response.ok) {
             toaster.success({
                 title: "Rental successful!",

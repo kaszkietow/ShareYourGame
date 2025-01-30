@@ -29,7 +29,7 @@ const Navbar = ({setGames, users}) => {
   useEffect(() => {
 
     const handleCurrUser = async () => {
-      const token = localStorage.getItem("token"); // Pobierz token z localStorage
+      const token = localStorage.getItem("token");
       if (!token) {
         setError("User not logged in");
         setIsLoading(false);
@@ -40,7 +40,7 @@ const Navbar = ({setGames, users}) => {
         const res = await fetch(BASE_URL + "/current_user", {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${token}`, // Dodaj token do nagłówka
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         });
@@ -51,7 +51,7 @@ const Navbar = ({setGames, users}) => {
           throw new Error(data.error);
         }
 
-        setCurrentUser(data); // Ustaw dane aktualnie zalogowanego użytkownika
+        setCurrentUser(data);
       } catch (error) {
         console.error("Error fetching user data:", error.message);
         setError(error.message);
@@ -81,9 +81,7 @@ const Navbar = ({setGames, users}) => {
                 ShareYourGame
             </Text>
 
-            {/* Actions */}
             <Flex display={"inline-flex"} alignItems={"center"}>
-                {/* Toggle Color Mode */}
                 <Button
                     onClick={toggleColorMode}
                     variant={"outline"}

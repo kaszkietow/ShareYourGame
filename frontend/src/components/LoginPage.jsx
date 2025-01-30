@@ -6,8 +6,8 @@ import { useState } from "react";
 import {useColorModeValue} from "./ui/color-mode.jsx";
 
 const LoginPage = () => {
-  const [username, setUsername] = useState(""); // Stan dla nazwy użytkownika
-  const [password, setPassword] = useState(""); // Stan dla hasła
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
