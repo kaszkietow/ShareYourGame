@@ -2,7 +2,7 @@ import {
   Box,
   Button,
   Card,
-  Flex,
+  Flex, Grid,
   Heading,
   Image,
   Text,
@@ -146,27 +146,41 @@ const GameCard = ({ game, user, setGames }) => {
           bg={useColorModeValue("teal.950", "gray.950")}
           color={"white"}
         >
-          <DialogHeader>
-            <Text fontSize={"xl"} fontWeight={"bold"}>{game.title}</Text>
-          </DialogHeader>
-          <DialogBody>
-            <Text>{game.description}</Text>
+          <Grid
+        spacing={{ base: 8, md: 10 }}>
+
+            <Flex>
             <Image
               src={game.imgUrl}
               alt={game.description}
               borderRadius={5}
-              aspectRatio={16 / 10}
-              mt={4}
+              ratio={2/1}
+              fit={'cover'}
+              align={'center'}
+              w={'100%'}
+              h={{ base: '100%', sm: '400px', lg: '500px' }}
             />
+            </Flex>
+            <DialogHeader>
+              <Text fontSize={"xl"} fontWeight={"bold"}>{game.title}</Text>
+            </DialogHeader>
+            <DialogBody>
+            <Text>{game.description}</Text>
+            <Flex justifyContent={"space-between"} mt={4}>
+              <Text>Genre🤠🎭🚗: {game.genre}</Text>
+              <Text>Condition🪫🪫🪫: {game.condition}</Text>
+              <Text>Platform💻: {game.platform}</Text>
+            </Flex>
             <Flex justifyContent="space-between" mt={4}>
               <Text>Owner: @{game.owner.username}</Text>
-              <Text>Price: PLN {game.price_per_day} /day</Text>
+              <Text>Price: {game.price_per_day} zl/day</Text>
             </Flex>
           </DialogBody>
           <DialogFooter>
             <Button onClick={() => setIsOpen(false)}>CANCEL</Button>
             <MakeRental game={game} currentUser={currentUser} user={user} />
           </DialogFooter>
+          </Grid>
         </DialogContent>
       </DialogRoot>
     </>

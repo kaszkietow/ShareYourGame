@@ -87,7 +87,7 @@ const EditUser = ({ setUsers, user }) => {
           <FaRegEdit />
         </Button>
       </DialogTrigger>
-      <DialogContent bg={useColorModeValue("blue.900", "gray.950")} color={"white"}>
+      <DialogContent bg={useColorModeValue("teal.950", "gray.950")} color={"white"} shadow={"xl"}>
         <form onSubmit={handleEditUser}>
           <DialogHeader>
             <DialogTitle>Edit User Profile</DialogTitle>
