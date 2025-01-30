@@ -183,7 +183,7 @@ class Rental(db.Model):
     total_price = db.Column(db.Float, nullable=False)
     status = db.Column(db.String(20), default="pending")
 ```
-### 💰 Model Payment
+### 💰 Model `Payment` (jeszcze nie obslugiwany)
 ```
 class Payment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -202,7 +202,3 @@ class Payment(db.Model):
 - Recenzje i oceny gier
 - System wiadomości między użytkownikami
 
-## 👨‍💻 Autor
-
-**Twoje Imię i Nazwisko**  
-[GitHub](https://github.com/twoje-github) | [LinkedIn](https://linkedin.com/in/twoje-linkedin)
