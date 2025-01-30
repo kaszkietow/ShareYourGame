@@ -5,7 +5,7 @@ import {
     Stack,
     Flex,
     Text,
-    HStack,
+    HStack, Box,
 } from "@chakra-ui/react";
 import {
   RadioCardItem,
@@ -23,6 +23,7 @@ import {
     NativeSelectField,
     NativeSelectRoot
 } from "./ui/native-select.jsx";
+import bgImage from "../../magenta-nature-fantasy-landscape.jpg";
 
 const RegisterPage = () => {
     const navigate = useNavigate();
@@ -73,6 +74,17 @@ const RegisterPage = () => {
 
 
     return (
+        <Box
+            bgImage={`url(${bgImage})`}
+            width="100vw"
+            minHeight="100vh"
+            backgroundSize="cover"
+            backgroundPosition="center"
+            backgroundRepeat="no-repeat"
+            position="fixed" // Zapewnia pełne pokrycie ekranu
+            top="0"
+            left="0"
+          >
         <Flex
             height="95vh"
             justifyContent="center"
@@ -149,6 +161,7 @@ const RegisterPage = () => {
                     </form>
             </Card.Root>
         </Flex>
+        </Box>
     );
 };
 export default RegisterPage;

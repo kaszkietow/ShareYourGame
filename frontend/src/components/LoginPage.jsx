@@ -1,9 +1,10 @@
-import { Button, Card, Input, Stack, Flex, Text } from "@chakra-ui/react";
+import {Button, Card, Input, Stack, Flex, Text, Box} from "@chakra-ui/react";
 import { Field } from "./ui/field";
 import { useNavigate } from "react-router-dom";
 import { PasswordInput } from "./ui/password-input";
 import { useState } from "react";
 import {useColorModeValue} from "./ui/color-mode.jsx";
+import bgImage from "../../digital-art-beautiful-mountains.jpg";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
@@ -35,6 +36,17 @@ const LoginPage = () => {
   };
 
   return (
+  <Box
+    bgImage={`url(${bgImage})`}
+    width="100vw"
+    minHeight="100vh"
+    backgroundSize="cover"
+    backgroundPosition="center"
+    backgroundRepeat="no-repeat"
+    position="fixed" // Zapewnia pełne pokrycie ekranu
+    top="0"
+    left="0"
+  >
     <Flex
       height="95vh"
       justifyContent="center"
@@ -89,6 +101,7 @@ const LoginPage = () => {
         </form>
       </Card.Root>
     </Flex>
+</Box>
   );
 };
 
