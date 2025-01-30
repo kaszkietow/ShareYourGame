@@ -16,7 +16,7 @@ API umożliwiające wynajem gier wideo między użytkownikami. Pozwala na rejest
 
 1. **Sklonuj repozytorium**
    ```sh
-   git clone https://github.com/twoje-repo/game-rental-api.git
+   git clone https://github.com/kaszkietow/ShareYourGame.git
    cd game-rental-api
    ```
 
