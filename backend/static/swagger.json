@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Car API",
+    "title": "Game API",
     "version": "1.0.0",
-    "description": "API do zarządzania samochodami i użytkownikami. Dane dla konta admin: admin hasło: kwa123"
+    "description": "API do zarządzania grami i użytkownikami.Dane logowania dla konta admin: login:admin, password:zaq12wsx"
   },
   "servers": [
     {
@@ -12,11 +12,11 @@
     }
   ],
   "paths": {
-    "/api/cars": {
+    "/api/games": {
       "get": {
-        "summary": "Pobierz wszystkie samochody",
-        "operationId": "getCars",
-        "tags": ["Cars"],
+        "summary": "Pobierz wszystkie gry",
+        "operationId": "getGames",
+        "tags": ["Games"],
         "security": [
           {
             "jwt": []
@@ -24,13 +24,13 @@
         ],
         "responses": {
           "200": {
-            "description": "Lista samochodów",
+            "description": "Lista gier",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Car"
+                    "$ref": "#/components/schemas/Game"
                   }
                 }
               }
@@ -42,9 +42,9 @@
         }
       },
       "post": {
-        "summary": "Dodaj nowy samochód",
-        "operationId": "createCar",
-        "tags": ["Cars"],
+        "summary": "Dodaj nową grę",
+        "operationId": "createGame",
+        "tags": ["Games"],
         "security": [
           {
             "jwt": []
@@ -55,18 +55,18 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Car"
+                "$ref": "#/components/schemas/Game"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Samochód został dodany",
+            "description": "Gra została dodana",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Car"
+                  "$ref": "#/components/schemas/Game"
                 }
               }
             }
@@ -75,16 +75,16 @@
             "description": "Brak wymaganych danych"
           },
           "500": {
-            "description": "Samochód istnieje."
+            "description": "Gra istnieje."
           }
         }
       }
     },
-    "/api/cars/{id}": {
+    "/api/games/{id}": {
       "delete": {
-        "summary": "Usuń samochód",
-        "operationId": "deleteCar",
-        "tags": ["Cars"],
+        "summary": "Usuń grę",
+        "operationId": "deleteGame",
+        "tags": ["Games"],
         "security": [
           {
             "jwt": []
@@ -95,7 +95,7 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "description": "ID samochodu",
+            "description": "ID gry",
             "schema": {
               "type": "integer"
             }
@@ -103,17 +103,17 @@
         ],
         "responses": {
           "200": {
-            "description": "Samochód usunięty"
+            "description": "Gra usunięta"
           },
           "404": {
-            "description": "Samochód nie znaleziony"
+            "description": "Gra nie znaleziona"
           }
         }
       },
       "patch": {
-        "summary": "Zaktualizuj samochód",
-        "operationId": "updateCar",
-        "tags": ["Cars"],
+        "summary": "Zaktualizuj grę",
+        "operationId": "updateGame",
+        "tags": ["Games"],
         "security": [
           {
             "jwt": []
@@ -124,7 +124,7 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "description": "ID samochodu",
+            "description": "ID gry",
             "schema": {
               "type": "integer"
             }
@@ -135,24 +135,24 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Car"
+                "$ref": "#/components/schemas/Game"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Samochód zaktualizowany",
+            "description": "Gra zaktualizowana",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Car"
+                  "$ref": "#/components/schemas/Game"
                 }
               }
             }
           },
           "404": {
-            "description": "Samochód nie znaleziony"
+            "description": "Gra nie znaleziona"
           },
           "400": {
             "description": "Błąd walidacji"
@@ -183,6 +183,31 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/register": {
+      "post": {
+        "summary": "Rejestracja użytkownika",
+        "operationId": "registerUser",
+        "tags": ["Authorization"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Użytkownik zarejestrowany"
+          },
+          "400": {
+            "description": "Brak wymaganych danych"
           }
         }
       }
@@ -305,31 +330,6 @@
         }
       }
     },
-    "/register": {
-      "post": {
-        "summary": "Rejestracja użytkownika",
-        "operationId": "registerUser",
-        "tags": ["Authorization"],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/User"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Użytkownik zarejestrowany"
-          },
-          "400": {
-            "description": "Brak wymaganych danych"
-          }
-        }
-      }
-    },
     "/logout": {
       "post": {
         "summary": "Wylogowanie użytkownika",
@@ -390,7 +390,7 @@
         }
       }
     },
-    "/reservation": {
+    "/rental": {
       "post": {
         "summary": "Utwórz rezerwację",
         "operationId": "makeReservation",
@@ -407,22 +407,22 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "car_id": {
+                  "game_id": {
                     "type": "integer",
-                    "description": "ID samochodu"
+                    "description": "ID gry"
                   },
-                  "reservation_date": {
+                  "start_date": {
                     "type": "string",
                     "format": "date-time",
-                    "description": "Data rezerwacji"
+                    "description": "Data rozpoczęcia rezerwacji"
                   },
-                  "return_date": {
+                  "end_date": {
                     "type": "string",
                     "format": "date-time",
-                    "description": "Data zwrotu"
+                    "description": "Data zakończenia rezerwacji"
                   }
                 },
-                "required": ["car_id", "reservation_date", "return_date"]
+                "required": ["game_id", "start_date", "end_date"]
               }
             }
           }
@@ -438,8 +438,8 @@
                     "message": {
                       "type": "string"
                     },
-                    "reservation": {
-                      "$ref": "#/components/schemas/Reservation"
+                    "rental": {
+                      "$ref": "#/components/schemas/Rental"
                     }
                   }
                 }
@@ -455,10 +455,10 @@
         }
       }
     },
-    "/getreservation": {
+    "/getrental": {
       "get": {
         "summary": "Pobierz rezerwacje",
-        "operationId": "getReservations",
+        "operationId": "getRentals",
         "tags": ["Reservations"],
         "security": [
           {
@@ -473,10 +473,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "reservations": {
+                    "rentals": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/Reservation"
+                        "$ref": "#/components/schemas/Rental"
                       }
                     }
                   }
@@ -501,39 +501,51 @@
       }
     },
     "schemas": {
-      "Car": {
+      "Game": {
         "type": "object",
         "properties": {
           "id": {
             "type": "integer",
-            "description": "ID samochodu"
+            "description": "ID gry"
           },
-          "model": {
+          "title": {
             "type": "string",
-            "description": "Model samochodu"
+            "description": "Tytuł gry"
           },
-          "description": {
+          "platform": {
             "type": "string",
-            "description": "Opis samochodu"
+            "description": "Platforma gry"
           },
-          "available": {
-            "type": "boolean",
-            "description": "Dostępność samochodu"
+          "genre": {
+            "type": "string",
+            "description": "Gatunek gry"
+          },
+          "condition": {
+            "type": "string",
+            "description": "Stan gry"
           },
           "img_url": {
             "type": "string",
-            "description": "URL obrazka samochodu"
+            "description": "URL obrazka gry"
           },
-          "price": {
+          "description": {
+            "type": "string",
+            "description": "Opis gry"
+          },
+          "price_per_day": {
             "type": "number",
-            "description": "Cena samochodu"
+            "description": "Cena za dzień wypożyczenia"
+          },
+          "available": {
+            "type": "boolean",
+            "description": "Dostępność gry"
           },
           "owner_id": {
             "type": "integer",
             "description": "ID właściciela"
           }
         },
-        "required": ["model", "description", "available", "img_url", "price"]
+        "required": ["title", "platform", "genre", "condition", "img_url", "description", "price_per_day", "available"]
       },
       "User": {
         "type": "object",
@@ -575,33 +587,41 @@
         },
         "required": ["username", "password"]
       },
-      "Reservation": {
+      "Rental": {
         "type": "object",
         "properties": {
           "id": {
             "type": "integer",
             "description": "ID rezerwacji"
           },
-          "car_id": {
+          "game_id": {
             "type": "integer",
-            "description": "ID samochodu"
+            "description": "ID gry"
           },
-          "user_id": {
+          "renter_id": {
             "type": "integer",
-            "description": "ID użytkownika"
+            "description": "ID wynajmującego"
           },
-          "reservation_date": {
+          "start_date": {
             "type": "string",
             "format": "date-time",
-            "description": "Data rezerwacji"
+            "description": "Data rozpoczęcia rezerwacji"
           },
-          "return_date": {
+          "end_date": {
             "type": "string",
             "format": "date-time",
-            "description": "Data zwrotu"
+            "description": "Data zakończenia rezerwacji"
+          },
+          "total_price": {
+            "type": "number",
+            "description": "Łączna cena rezerwacji"
+          },
+          "status": {
+            "type": "string",
+            "description": "Status rezerwacji"
           }
         },
-        "required": ["car_id", "user_id", "reservation_date", "return_date"]
+        "required": ["game_id", "renter_id", "start_date", "end_date"]
       }
     }
   }

@@ -10,33 +10,33 @@ import {Button, Input, Stack} from "@chakra-ui/react";
 import {Field} from "./ui/field.jsx";
 import {useState} from "react";
 import {toaster} from "./ui/toaster.jsx";
-import {BASE_URL} from "./CarsGrid.jsx";
+import {BASE_URL} from "./GamesGrid.jsx";
 
-const MakeReservation = ({ car, currentUser }) => {
-    const [reservation, setReservation] = useState([]);
+const MakeRental = ({ game, currentUser }) => {
+    const [rental, setRental] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [inputs, setInputs] = useState({
-        car_id: car.id,
-        user_id: currentUser.id,
-        reservation_date: "",
-        return_date: "",
+        game_id: game.id,
+        renter_id: currentUser.id,
+        start_date: "",
+        end_date: "",
     });
 
-    const handleReservation = async (e) => {
+    const handleRental = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     const token = localStorage.getItem("token");
-    const carData = { ...inputs };
+    const gameData = { ...inputs };
 
     try {
-        const response = await fetch(BASE_URL + "/reservation", {
+        const response = await fetch(BASE_URL + "/rental", {
             method: "POST",
             headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(carData),
+            body: JSON.stringify(gameData),
         });
 
         console.log("Response status:", response.status); // Logowanie statusu odpowiedzi
@@ -45,17 +45,17 @@ const MakeReservation = ({ car, currentUser }) => {
 
         if (response.ok) {
             toaster.success({
-                title: "Reservation successful!",
-                description: `Reservation ID: ${data.reservation.id}`,
+                title: "Rental successful!",
+                description: `Rental ID: ${data.rental.id}`,
                 duration: 4000,
                 isClosable: true,
             });
-            setReservation((prevReservation) => [...prevReservation, data]);
+            setRental((prevRental) => [...prevRental, data]);
             setIsOpen(false);
             setInputs({
-                car_id: "",
-                reservation_date: "",
-                return_date: "",
+                game_id: "",
+                start_date: "",
+                end_date: "",
             });
         } else {
             toaster.error({
@@ -77,36 +77,36 @@ const MakeReservation = ({ car, currentUser }) => {
         setIsLoading(false);
     }
 };
-const carBooked = car.available === "false";
+const gameBooked = game.available === "false";
     return (
         <DialogRoot open={isOpen} onOpenChange={setIsOpen}>
-            {!carBooked &&
+            {!gameBooked &&
             <DialogTrigger asChild>
                  <Button variant="solid">Book now</Button>
             </DialogTrigger>
             }
             <DialogContent>
-                <form onSubmit={handleReservation}>
+                <form onSubmit={handleRental}>
                     <DialogHeader>
-                        <DialogTitle>Book a {car.model} 🚀🚜</DialogTitle>
+                        <DialogTitle>Book a {game.title} 🔥🌟</DialogTitle>
                     </DialogHeader>
                     <DialogBody pb="4">
                         <Stack gap="4">
                             <Field label="Reservation Date">
                                 <Input
                                     type="datetime-local"
-                                    value={inputs.reservation_date}
+                                    value={inputs.start_date}
                                     onChange={(e) =>
-                                        setInputs({...inputs, reservation_date: e.target.value})
+                                        setInputs({...inputs, start_date: e.target.value})
                                     }
                                 />
                             </Field>
                             <Field label="Return Date">
                                 <Input
                                     type="datetime-local"
-                                    value={inputs.return_date}
+                                    value={inputs.end_date}
                                     onChange={(e) =>
-                                        setInputs({...inputs, return_date: e.target.value})
+                                        setInputs({...inputs, end_date: e.target.value})
                                     }
                                 />
                             </Field>
@@ -126,4 +126,4 @@ const carBooked = car.available === "false";
     );
 };
 
-export default MakeReservation;
+export default MakeRental;

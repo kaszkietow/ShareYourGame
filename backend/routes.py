@@ -1,7 +1,7 @@
 import datetime
 from app import app, db
 from flask import request, jsonify, Flask, redirect, send_from_directory
-from models import Car, User, Reservation
+from models import Game, User, Rental
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, get_jwt
 from flask_swagger_ui import get_swaggerui_blueprint
 from datetime import datetime
@@ -17,85 +17,97 @@ app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 3600
 jwt = JWTManager(app)
 app.config["JWT_VERIFY_SUB"] = False
 
-@app.route("/api/cars", methods=["GET"])
+
+@app.route("/api/games", methods=["GET"])
 @jwt_required()
-def get_cars():
+def get_games():
     try:
-        cars = Car.query.all()
-        cars_json = [car.to_json_car_with_owner() for car in cars]
-        return jsonify(cars_json), 200
+        games = Game.query.all()
+        game_json = [game.to_json_game_with_owner() for game in games]
+        return jsonify(game_json), 200
     except Exception as e:
-        print(f"Error fetching cars: {e}")
+        print(f"Error fetching games: {e}")
         return jsonify({"error": "Internal Server Error"}), 500
 
 
 # Add new card
-@app.route("/api/cars", methods=["POST"])
+@app.route("/api/games", methods=["POST"])
 @jwt_required()
-def create_car():
+def create_game():
     try:
         data = request.json
         print(f"Received data: {data}")
-        required_fields = ["model", "description", "available", "img_url", "price"]
+        required_fields = ["title", "platform", "genre", "condition", "img_url", "description", "price_per_day",
+                           "available"]
         for field in required_fields:
             if field not in data or not data.get(field):
                 return jsonify({"error": f"Missing required field: {field}"}), 400
 
         id = data.get("id")
-        model = data.get("model")
-        description = data.get("description")
-        available = data.get("available")
+        title = data.get("title")
+        platform = data.get("platform")
+        genre = data.get("genre")
+        condition = data.get("condition")
         img_url = data.get("img_url")
-        price = data.get("price")
+        description = data.get("description")
+        price_per_day = data.get("price_per_day")
+        available = data.get("available")
         owner_id = data.get("owner_id")
 
-        new_car = Car(
-            id=id, model=model, description=description,
-            available=available, img_url=img_url, price=price, owner_id=owner_id
+        new_game = Game(
+            id=id, title=title, platform=platform, genre=genre, condition=condition,
+            description=description, price_per_day=price_per_day,
+            available=available, img_url=img_url, owner_id=owner_id
         )
-        db.session.add(new_car)
+        db.session.add(new_game)
         db.session.commit()
-        return jsonify(new_car.to_json_car_with_owner()), 200
+        return jsonify(new_game.to_json_game_with_owner()), 200
     except Exception as e:
         db.session.rollback()
         print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500
 
 
-# Delete car
-@app.route("/api/cars/<int:id>", methods=["DELETE"])
+@app.route("/api/games/<int:id>", methods=["DELETE"])
 @jwt_required()
-def delete_car(id):
+def delete_game(id):
     try:
-        car = Car.query.get(id)
-        if car is None:
-            return jsonify({"error": "Car doen't exist"}), 404
-        db.session.delete(car)
+        game = Game.query.get(id)
+        if game is None:
+            return jsonify({"error": "Game doesn't exist"}), 404
+
+        Rental.query.filter_by(game_id=game.id).delete()
         db.session.commit()
-        return jsonify({"message": "Car deleted successfully"}), 200
+
+        db.session.delete(game)
+        db.session.commit()
+        return jsonify({"message": "Game deleted successfully"}), 200
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/api/cars/<int:id>", methods=["PATCH"])
+@app.route("/api/games/<int:id>", methods=["PATCH"])
 @jwt_required()
-def update_car(id):
+def update_game(id):
     try:
-        car = Car.query.get(id)
-        if car is None:
-            return jsonify({"error": "Car not found"}), 404
+        game = Game.query.get(id)
+        if game is None:
+            return jsonify({"error": "Game not found"}), 404
 
         data = request.json
 
-        car.model = data.get("model", car.model)
-        car.description = data.get("description", car.description)
-        car.available = data.get("available", car.available)
-        car.img_url = data.get("img_url", car.img_url)
-        car.price = data.get("price", car.price)
+        game.title = data.get("title", game.title)
+        game.platform = data.get("platform", game.platform)
+        game.genre = data.get("genre", game.genre)
+        game.condition = data.get("condition", game.condition)
+        game.img_url = data.get("img_url", game.img_url)
+        game.description = data.get("description", game.description)
+        game.price_per_day = data.get("price_per_day", game.price_per_day)
+        game.available = data.get("available", game.available)
 
         db.session.commit()
-        return jsonify(car.to_json_car_with_owner()), 200
+        return jsonify(game.to_json_game_with_owner()), 200
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
@@ -114,7 +126,7 @@ def register_user():
     try:
         data = request.get_json()
 
-        required_fields = ["username", "password", "gender"]
+        required_fields = ["username", "password", "gender", "location"]
         for field in required_fields:
             if field not in data:
                 return jsonify({"error": f"Missing required field: {field}"}), 400
@@ -122,6 +134,7 @@ def register_user():
         username = data.get("username")
         password = data.get("password")
         gender = data.get("gender")
+        location = data.get("location")
 
         if not username or len(username.strip()) < 3:
             return jsonify({"error": "Username must be at least 3 characters long"}), 400
@@ -132,6 +145,9 @@ def register_user():
         if gender not in ["male", "female"]:
             return jsonify({"error": "Gender must be either 'male' or 'female'"}), 400
 
+        if not location:
+            return jsonify({"error": "Location is required."}), 400
+
         if User.query.filter_by(username=username).first():
             return jsonify({"error": "Username already exists"}), 400
 
@@ -140,7 +156,7 @@ def register_user():
         else:
             img_url = f"https://avatar.iran.liara.run/public/girl?username={username}"
 
-        new_user = User(username=username, password=password, gender=gender, img_url=img_url)
+        new_user = User(username=username, password=password, gender=gender, img_url=img_url, location=location)
         db.session.add(new_user)
         db.session.commit()
         return jsonify({"message": "User registered successfully"}), 201
@@ -150,7 +166,6 @@ def register_user():
         return jsonify({"error": str(e)}), 500
 
 
-
 @app.route("/api/users/<int:id>", methods=["DELETE"])
 @jwt_required()
 def delete_user(id):
@@ -158,11 +173,30 @@ def delete_user(id):
         user = User.query.get(id)
         if user is None:
             return jsonify({"error": "User doesn't exist"}), 404
+
+        print(f"Deleting user: {user.id}")
+
+        games_to_delete = Game.query.filter_by(owner_id=id).all()
+        if games_to_delete:
+            print(f"Found {len(games_to_delete)} games to delete.")
+        else:
+            print("No games found for this user.")
+
+        for game in games_to_delete:
+            rentals_to_delete = Rental.query.filter_by(game_id=game.id).all()
+            for rental in rentals_to_delete:
+                db.session.delete(rental)
+
+            db.session.delete(game)
+
         db.session.delete(user)
         db.session.commit()
-        return jsonify({"message": "User deleted successfully"}), 200
+
+        print(f"User {user.id} and associated games deleted successfully.")
+        return jsonify({"message": "User and associated games deleted successfully"}), 200
     except Exception as e:
         db.session.rollback()
+        print(f"Error while deleting user: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 
@@ -174,17 +208,38 @@ def update_user(id):
         if user is None:
             return jsonify({"error": "User not found"}), 404
 
+        current_user_id = get_jwt_identity()["id"]
+        current_user = User.query.get(current_user_id)
+
         data = request.json
 
-        user.username = data.get("username", user.username)
-        user.password = data.get("password", user.password)
-        user.img_url = data.get("img_url", user.img_url)
+        username = data.get("username")
+        if username:
+            existing_user = User.query.filter_by(username=username).first()
+            if existing_user and existing_user.id != user.id:
+                return jsonify({"error": "This username is already taken"}), 400
+
+        if current_user.username == "admin" and current_user.id != user.id:
+            if username:
+                user.username = username
+
+        password = data.get("password")
+        location = data.get("location")
+
+        if password:
+            user.password = password
+        if location:
+            user.location = location
 
         db.session.commit()
         return jsonify(user.to_json_user()), 200
+
     except Exception as e:
         db.session.rollback()
+        print("Error while updating user:", e)
         return jsonify({"error": str(e)}), 500
+
+
 
 
 @app.route("/login", methods=["POST"])
@@ -243,86 +298,91 @@ def get_current_user():
         return jsonify({"error": "Internal Server Error"}), 500
 
 
-def set_car_unavailable_later(car_id, delay):
+def set_game_unavailable_later(game_id, delay):
     def update_availability():
         with app.app_context():
-            car = Car.query.get(car_id)
-            if car:
-                car.available = "false"
+            game = Game.query.get(game_id)
+            if game:
+                game.available = "false"
                 db.session.commit()
-                print(f"Car ID {car_id} is now unavailable.")
+                print(f"Game ID {game_id} is now unavailable.")
     timer = threading.Timer(delay, update_availability)
     timer.start()
 
 
-def set_car_available_later(car_id, delay):
+def set_game_available_later(game_id, delay):
     def update_availability():
         with app.app_context():
-            car = Car.query.get(car_id)
-            if car:
-                car.available = "true"
+            game = Game.query.get(game_id)
+            if game:
+                game.available = "true"
                 db.session.commit()
-                print(f"Car ID {car_id} is now available.")
+                print(f"Game ID {game_id} is now available.")
     timer = threading.Timer(delay, update_availability)
     timer.start()
 
 
-@app.route("/reservation", methods=["POST"])
+@app.route("/rental", methods=["POST"])
 @jwt_required()
 def make_reservation():
     try:
         data = request.get_json()
         print("Request data:", data)
 
-        car_id = data.get("car_id")
-        user_id = get_jwt_identity()["id"]
-        reservation_date = datetime.fromisoformat(data.get("reservation_date")).replace(tzinfo=ZoneInfo("Europe/Warsaw"))
-        return_date = datetime.fromisoformat(data.get("return_date")).replace(tzinfo=ZoneInfo("Europe/Warsaw"))
+        game_id = data.get("game_id")
+        renter_id = get_jwt_identity()["id"]
+        start_date = datetime.fromisoformat(data.get("start_date")).replace(tzinfo=ZoneInfo("Europe/Warsaw"))
+        end_date = datetime.fromisoformat(data.get("end_date")).replace(tzinfo=ZoneInfo("Europe/Warsaw"))
 
-        print(f"Car ID: {car_id}, User ID: {user_id}, Reservation Date: {reservation_date}, Return Date: {return_date}")
+        print(f"Game ID: {game_id}, Renter ID: {renter_id}, Rental Date: {start_date}, Return Date: {end_date}")
 
-        car = Car.query.get(car_id)
-        if not car or not car.available:
-            return jsonify({"error": "Car not available"}), 400
+        game = Game.query.get(game_id)
+        if not game or not game.available:
+            return jsonify({"error": "Game not available"}), 400
 
-        conflicting_reservations = Reservation.query.filter(
-            Reservation.car_id == car_id,
-            Reservation.return_date > reservation_date,
-            Reservation.reservation_date < return_date
+        conflicting_rentals = Rental.query.filter(
+            Rental.game_id == game_id,
+            Rental.start_date > start_date,
+            Rental.start_date < end_date
         ).all()
 
-        if conflicting_reservations:
-            return jsonify({"error": "Car is already reserved during this time"}), 400
+        if conflicting_rentals:
+            return jsonify({"error": "Game is already reserved during this time"}), 400
 
-        reservation = Reservation(
-            car_id=car_id,
-            user_id=user_id,
-            reservation_date=reservation_date,
-            return_date=return_date,
+        rental_days = (end_date - start_date).days + 1
+        total_price = game.price_per_day * rental_days
+
+        rental = Rental(
+            game_id=game_id,
+            renter_id=renter_id,
+            start_date=start_date,
+            end_date=end_date,
+            status="pending",
+            total_price=total_price,
         )
-        db.session.add(reservation)
+        db.session.add(rental)
         db.session.commit()
 
-        delay_to_start = (reservation_date - datetime.now(ZoneInfo("Europe/Warsaw"))).total_seconds()
-        delay_to_end = (return_date - datetime.now(ZoneInfo("Europe/Warsaw"))).total_seconds()
+        delay_to_start = (start_date - datetime.now(ZoneInfo("Europe/Warsaw"))).total_seconds()
+        delay_to_end = (end_date - datetime.now(ZoneInfo("Europe/Warsaw"))).total_seconds()
 
-        print(f"Scheduling availability updates for car ID {car_id}")
-        set_car_unavailable_later(car_id, delay_to_start)
-        set_car_available_later(car_id, delay_to_end)
+        print(f"Scheduling availability updates for car ID {game_id}")
+        set_game_unavailable_later(game_id, delay_to_start)
+        set_game_available_later(game_id, delay_to_end)
 
-        return jsonify({"message": "Reservation created successfully", "reservation": reservation.to_json_reservation()}), 201
+        return jsonify({"message": "Rental created successfully", "rental": rental.to_json_rental()}), 201
     except IntegrityError as e:
         db.session.rollback()
-        print("IntegrityError in make_reservation:", str(e))
+        print("IntegrityError in make_rental:", str(e))
         return jsonify({"error": "Database error"}), 400
     except Exception as e:
-        print("Error in make_reservation:", str(e))
+        print("Error in make_rental:", str(e))
         return jsonify({"error": "Internal Server Error"}), 500
 
 
-@app.route("/getreservation", methods=["GET"])
+@app.route("/getrental", methods=["GET"])
 @jwt_required()
-def get_reservations():
+def get_rentals():
     try:
         current_user_id = get_jwt_identity()["id"]
         current_user = User.query.get(current_user_id)
@@ -334,21 +394,20 @@ def get_reservations():
             return jsonify({"error": "User not found"}), 404
 
         if current_user.username == "admin":
-            reservations = Reservation.query.all()
+            rentals = Rental.query.all()
         else:
-            reservations = Reservation.query.filter_by(user_id=current_user_id).all()
+            rentals = Rental.query.filter_by(renter_id=current_user_id).all()
 
-        print(f"Reservations: {reservations}")
+        print(f"Rentals: {rentals}")
 
-        reservations_data = [reservation.to_json_reservation() for reservation in reservations]
-        return jsonify({"reservations": reservations_data}), 200
+        rentals_data = [rental.to_json_rental() for rental in rentals]
+        user_data = {
+            "id": current_user.id,
+            "username": current_user.username
+        }
+
+        return jsonify({"user": user_data, "rentals": rentals_data}), 200
     except Exception as e:
-        print("Error in get_reservations:", str(e))
+        print("Error in get_rentals:", str(e))
         return jsonify({"error": "Internal Server Error"}), 500
-
-
-
-
-
-
 

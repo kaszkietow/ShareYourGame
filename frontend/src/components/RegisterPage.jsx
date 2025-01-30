@@ -8,7 +8,7 @@ import {
     HStack,
 } from "@chakra-ui/react";
 import {
-    RadioCardItem,
+  RadioCardItem,
   RadioCardLabel,
   RadioCardRoot,
 } from "./ui/radio-card.jsx"
@@ -17,13 +17,19 @@ import { Field } from "./ui/field";
 import { useNavigate } from "react-router-dom";
 import { PasswordInput } from "./ui/password-input"
 import {useState} from "react";
-import {BASE_URL} from "./CarsGrid.jsx";
+import {BASE_URL} from "./GamesGrid.jsx";
+import {useColorModeValue} from "./ui/color-mode.jsx";
+import {
+    NativeSelectField,
+    NativeSelectRoot
+} from "./ui/native-select.jsx";
 
 const RegisterPage = () => {
     const navigate = useNavigate();
     const [username, setUsername] = useState(""); // Stan dla nazwy użytkownika
     const [password, setPassword] = useState(""); // Stan dla hasła
-    const [gender, setGender] = useState("")
+    const [gender, setGender] = useState("");
+    const [location, setLocation] = useState("");
 
     const handleCreateUser = async (e) => {
     e.preventDefault();
@@ -48,7 +54,8 @@ const RegisterPage = () => {
         const response = await fetch(BASE_URL + "/api/register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, password, gender }), // Wysyłamy dane użytkownika
+            body: JSON.stringify({ username, password, gender, location }), // Wysyłamy dane użytkownika
+
         });
 
         const data = await response.json();
@@ -57,10 +64,12 @@ const RegisterPage = () => {
         }
         alert("Account successfully created 🎉");
         navigate("/");
+
     } catch (error) {
         console.error("Registration error:", error);
         alert("An error occurred during registration: " + error.message);
     }
+    console.log(data)
 };
 
 
@@ -70,7 +79,7 @@ const RegisterPage = () => {
             justifyContent="center"
             alignItems="center"
         >
-            <Card.Root width={{ base: "80vw", md: "70vw" }}> {/* Ustawienie szerokości na 50% widoku */}
+            <Card.Root width={{ base: "80vw", md: "70vw" }} bg={useColorModeValue("gray.700", "gray.750")} color={"white"}> {/* Ustawienie szerokości na 50% widoku */}
                 <Card.Header>
                     <Text
                         textStyle={{ base: "2xl", md: "4xl" }}
@@ -79,7 +88,7 @@ const RegisterPage = () => {
                     >
                         Sign Up
                     </Text>
-                    <Card.Description>
+                    <Card.Description color={"white"}>
                         Uzupełnij formularz teraz, aby utworzyć konto.
                     </Card.Description>
                 </Card.Header>
@@ -119,6 +128,19 @@ const RegisterPage = () => {
                                         </RadioCardItem>
                                     </HStack>
                             </RadioCardRoot>
+                            <NativeSelectRoot size="md" >
+                              <NativeSelectField
+                                placeholder="Select localization"
+                                bg={useColorModeValue("gray.700", "gray.950")}
+                                value={location}
+                                onChange={(e) => setLocation(e.currentTarget.value)}
+                              >
+                                <option value="Nowy Sącz">Nowy Sącz</option>
+                                <option value="Kraków">Kraków</option>
+                                <option value="Bochnia">Bochnia</option>
+                                <option value="Katowice">Katowice</option>
+                              </NativeSelectField>
+                            </NativeSelectRoot>
                         </Stack>
                     </Card.Body>
                     <Card.Footer justifyContent="flex-end">

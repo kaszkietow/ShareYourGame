@@ -2,9 +2,9 @@ import { Button, MenuContent, MenuItem, MenuRoot, MenuTrigger} from "@chakra-ui/
 import { Avatar } from "./ui/avatar.jsx";
 import { useNavigate } from "react-router-dom"; // Użycie hooka do nawigacji
 import * as React from "react";
-import {BASE_URL} from "./CarsGrid.jsx";
+import {BASE_URL} from "./GamesGrid.jsx";
 
-const UserMenu = ({ currentUser }) => {
+const UserMenu = ({ currentUser, users }) => {
   const navigate = useNavigate(); // Hook do przekierowania
 
   // Funkcja obsługująca wylogowanie
@@ -44,9 +44,9 @@ const UserMenu = ({ currentUser }) => {
 
 
         <MenuItem onClick={() => navigate("/myprofile", { state: { currentUser } })} value="myprofile" >My profile</MenuItem>
-        <MenuItem onClick={() => navigate("/reservations", { state: { currentUser } })} value={"reservations"}>Reservations</MenuItem>
+        <MenuItem onClick={() => navigate("/rentals", { state: { currentUser } })} value={"rentals"}>Rentals</MenuItem>
         {currentUser.username === "admin" && (
-          <MenuItem onClick={() => navigate("/userslist")} value={"users"}>Users</MenuItem>
+          <MenuItem onClick={() => navigate("/userslist")} users={users} value={"users"}>Users</MenuItem>
         )}
         <MenuItem
           value="logout"

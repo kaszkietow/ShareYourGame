@@ -20,21 +20,26 @@ import { Field } from "./ui/field";
 import { IoAddCircleSharp } from "react-icons/io5";
 import { toaster } from "./ui/toaster.jsx";
 import {jwtDecode} from "jwt-decode";
-import {BASE_URL} from "./CarsGrid.jsx";
+import {BASE_URL} from "./GamesGrid.jsx";
 import {NumberInputField, NumberInputRoot} from "./ui/number-input.jsx";
+import {NativeSelectField, NativeSelectRoot} from "./ui/native-select.jsx";
+import {useColorModeValue} from "./ui/color-mode.jsx";
 
-const AddCar = ( { setCars }) => {
+const AddGame = ({ setGames }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false); // Fixed initial state
-  const [price, setPrice] = useState("100")
+  const [price_per_day, setPrice_per_day] = useState("5")
   const [inputs, setInputs] = useState({
-    model: "",
+    title: "",
+    platform: "",
+    genre: "",
+    condition: "",
+    img_url: "",
     description: "",
     available: "",
-    img_url: "",
   });
 
-  const handleAddCar = async (e) => {
+  const handleAddGame = async (e) => {
   e.preventDefault();
   setIsLoading(true);
 
@@ -64,19 +69,19 @@ const AddCar = ( { setCars }) => {
   }
 
   // Łączenie inputs i owner_id w jeden obiekt
-  const carData = { ...inputs, owner_id, price };
+  const gameData = { ...inputs, owner_id, price_per_day };
 
   // Dodanie logowania do konsoli, aby sprawdzić, co wysyłasz
-  console.log('Sending car data to server:', carData);
+  console.log('Sending game data to server:', gameData);
 
   try {
-    const res = await fetch(BASE_URL+"/api/cars", {
+    const res = await fetch(BASE_URL+"/api/games", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(carData),  // Wysyłanie połączonych danych
+      body: JSON.stringify(gameData),  // Wysyłanie połączonych danych
     });
 
     const data = await res.json();
@@ -90,14 +95,17 @@ const AddCar = ( { setCars }) => {
       duration: 4000,
     });
 
-    setCars((prevCars) => [...prevCars, data]);
+    setGames((prevGames) => [...prevGames, data]);
 
     setIsOpen(false);
     setInputs({
-      model: "",
-      description: "",
-      available: "",
-      img_url: "",
+        title: "",
+        platform: "",
+        genre: "",
+        condition: "",
+        img_url: "",
+        description: "",
+        available: "",
     });
   } catch (error) {
     toaster.error({
@@ -117,32 +125,85 @@ const AddCar = ( { setCars }) => {
           <IoAddCircleSharp />
         </Button>
       </DialogTrigger>
-      <DialogContent>
-        <form onSubmit={handleAddCar}>
+      <DialogContent bg={useColorModeValue("teal.900", "gray.950")} color={"white"}>
+        <form onSubmit={handleAddGame}>
           <DialogHeader>
-            <DialogTitle>Add a new car 🚗</DialogTitle>
+            <DialogTitle>Add a new game 🎮</DialogTitle>
           </DialogHeader>
           <DialogBody pb="4">
             <Stack gap="4">
-              <Field label="Model">
+              <Field label="Title">
                 <Input
-                    placeholder="BMW M3 CS"
-                    value={inputs.model}
+                    placeholder="Uncharted 3"
+                    value={inputs.title}
                     onChange={(e) =>
-                        setInputs({...inputs, model: e.target.value})
+                        setInputs({...inputs, title: e.target.value})
                     }
                 />
               </Field>
-              <Field label="Description">
-                <Input
-                    placeholder="Description of the car"
-                    value={inputs.description}
-                    onChange={(e) =>
-                        setInputs({...inputs, description: e.target.value})
-                    }
-                />
+              <Stack>
+              <RadioCardRoot >
+                <RadioCardLabel>Platform</RadioCardLabel>
+                        <HStack align="stretch">
+                        <RadioCardItem
+                          label={"PS3"}
+                          value={'PS3'}
+                          onChange={(e) =>
+                            setInputs({...inputs, platform: e.target.value})
+                          }/>
+                        <RadioCardItem
+                          label={"PS4"}
+                          value={'PS4'}
+                          onChange={(e) =>
+                            setInputs({...inputs, platform: e.target.value})
+                          }/>
+                        <RadioCardItem
+                          label={"PS5"}
+                          value={'PS5'}
+                          onChange={(e) =>
+                            setInputs({...inputs, platform: e.target.value})
+                          }/>
+                          <RadioCardItem
+                          label={"PC"}
+                          value={'PC'}
+                          onChange={(e) =>
+                            setInputs({...inputs, platform: e.target.value})
+                          }/>
+                </HStack>
+              </RadioCardRoot>
+              </Stack>
+              <Field label={"Genre"}>
+                <NativeSelectRoot size="md" >
+                  <NativeSelectField
+                      placeholder="Select genre"
+                      bg={useColorModeValue("teal.900", "gray.950")}
+                      value={inputs.genre}
+                      onChange={(e) => setInputs({...inputs, genre: e.currentTarget.value})}
+                  >
+                    <option value="action">Action</option>
+                    <option value="adventure">Adventure</option>
+                    <option value="role-playing">Role-playing</option>
+                    <option value="simulation">Simulation</option>
+                    <option value="strategy">Strategy</option>
+                    <option value="sports">Sports</option>
+                  </NativeSelectField>
+                </NativeSelectRoot>
               </Field>
-                <Stack>
+              <Field label={"Condition"}>
+                <NativeSelectRoot size="md" >
+                  <NativeSelectField
+                      placeholder="Select genre"
+                      bg={useColorModeValue("teal.900", "gray.950")}
+                      value={inputs.condition}
+                      onChange={(e) => setInputs({...inputs, condition: e.currentTarget.value})}
+                  >
+                    <option value="new">New</option>
+                    <option value="used">Used</option>
+                    <option value="damaged">Damaged</option>
+                  </NativeSelectField>
+                </NativeSelectRoot>
+              </Field>
+              <Stack>
               <RadioCardRoot >
                 <RadioCardLabel>Avability</RadioCardLabel>
                         <HStack align="stretch">
@@ -164,10 +225,10 @@ const AddCar = ( { setCars }) => {
                 </HStack>
               </RadioCardRoot>
               </Stack>
-              <Field label="Price" >
+              <Field label="Price per day" >
                 <NumberInputRoot
-                    value={price}
-                    onValueChange={(e) => setPrice(e.value)}>
+                    value={price_per_day}
+                    onValueChange={(e) => setPrice_per_day(e.value)}>
                   <NumberInputField/>
                 </NumberInputRoot>
               </Field>
@@ -179,6 +240,17 @@ const AddCar = ( { setCars }) => {
                     value={inputs.img_url}
                     onChange={(e) =>
                         setInputs({...inputs, img_url: e.target.value})
+                    }
+                />
+              </Field>
+              <Field label="Description">
+                <Textarea
+                    placeholder="Great and beautifull game."
+                    overflow={"hidden"}
+                    resize={"none"}
+                    value={inputs.description}
+                    onChange={(e) =>
+                        setInputs({...inputs, description: e.target.value})
                     }
                 />
               </Field>
@@ -201,4 +273,4 @@ const AddCar = ( { setCars }) => {
   );
 };
 
-export default AddCar;
+export default AddGame;

@@ -1,27 +1,28 @@
 import React from 'react';
-import Navbar1 from "./Navbar1.jsx";
+import Navbar from "./Navbar.jsx";
 import {Container, Flex, Stack, Table, Image, Box} from "@chakra-ui/react";
 import { useLocation } from "react-router-dom";
 import {Avatar} from "./ui/avatar.jsx";
+import EditGame from "./EditGame.jsx";
 
-const MyProfile = () => {
+const MyProfile = (setGames, game) => {
     const location = useLocation();
     const currentUser = location.state?.currentUser;
 
     console.log("Received currentUser in MyProfile:", currentUser);
 
-    if (!currentUser) {
-        return <div>Loading user data...</div>;
-    }
-
-    if (!Array.isArray(currentUser.cars) || currentUser.cars.length === 0) {
-        return <div>No cars available for this user.</div>;
-    }
+    // if (!currentUser) {
+    //     return <div>Loading user data...</div>;
+    // }
+    //
+    // if (!Array.isArray(currentUser.cars) || currentUser.cars.length === 0) {
+    //     return <div>No cars available for this user.</div>;
+    // }
 
     // Renderowanie tabeli samochodów
     return (
         <Container maxW="container.xl">
-            <Navbar1/>
+            <Navbar/>
             <Flex direction={"row"}>
             <Image src={currentUser.imgUrl}
                    width={{base:"60px", md:"125px"}}
@@ -39,18 +40,24 @@ const MyProfile = () => {
                     <Table.Header>
                         <Table.Row>
                             <Table.ColumnHeader>IMG</Table.ColumnHeader>
-                            <Table.ColumnHeader>Model</Table.ColumnHeader>
+                            <Table.ColumnHeader>Title</Table.ColumnHeader>
+                            <Table.ColumnHeader>Platform</Table.ColumnHeader>
                             <Table.ColumnHeader>Available</Table.ColumnHeader>
-                            <Table.ColumnHeader textAlign="end">Price</Table.ColumnHeader>
+                            <Table.ColumnHeader>Genre</Table.ColumnHeader>
+                            <Table.ColumnHeader>Condition</Table.ColumnHeader>
+                            <Table.ColumnHeader textAlign="end">PPD</Table.ColumnHeader>
                         </Table.Row>
                     </Table.Header>
                     <Table.Body>
-                        {currentUser.cars.map((car) => (
-                            <Table.Row key={car.id}>
-                                <Table.Cell><Avatar src={car.imgUrl}/></Table.Cell>
-                                <Table.Cell>{car.model}</Table.Cell>
-                                <Table.Cell>{car.available === "true" ? "Yes" : "No"}</Table.Cell>
-                                <Table.Cell textAlign="end">{car.price + "PLN"} </Table.Cell>
+                        {currentUser.games.map((game) => (
+                            <Table.Row key={game.id}>
+                                <Table.Cell><Avatar src={game.imgUrl}/></Table.Cell>
+                                <Table.Cell>{game.title}</Table.Cell>
+                                <Table.Cell>{game.platform}</Table.Cell>
+                                <Table.Cell>{game.available === "true" ? "Yes" : "No"}</Table.Cell>
+                                <Table.Cell>{game.genre}</Table.Cell>
+                                <Table.Cell>{game.condition}</Table.Cell>
+                                <Table.Cell textAlign="end">{game.price_per_day + "PLN"} </Table.Cell>
                             </Table.Row>
                         ))}
                     </Table.Body>

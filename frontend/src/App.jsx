@@ -7,9 +7,9 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoginPage from "./components/LoginPage.jsx";
 import RegisterPage from "./components/RegisterPage.jsx";
 import HomePage from "./components/HomePage.jsx";
-import CarsGrid from "./components/CarsGrid.jsx";
+import CarsGrid from "./components/GamesGrid.jsx";
 import MyProfile from "./components/MyProfile.jsx";
-import Reservations from "./components/Reservations.jsx";
+import Rentals from "./components/Rentals.jsx";
 import UsersList from "./components/UsersList.jsx";
 
 
@@ -43,7 +43,7 @@ function App() {
                             }
                         />
                         <Route
-                            path="/cars"
+                            path="/games"
                             element={
 
                                     <CarsGrid />
@@ -56,9 +56,9 @@ function App() {
                             }
                         />
                         <Route
-                            path={"/reservations"}
+                            path={"/rentals"}
                             element={
-                                <Reservations/>
+                                <Rentals/>
                             }
                         />
                         <Route

@@ -1,20 +1,20 @@
 import { Box, Container, Flex, Grid, Spinner, Text } from "@chakra-ui/react";
 import Navbar from "./Navbar.jsx";
-import CarCard from "./CarCard.jsx";
+import GameCard from "./GameCard.jsx";
 import { useEffect, useState } from "react";
 
 export const BASE_URL = "http://localhost:5000"
-const CarsGrid = () => {
-  const [cars, setCars] = useState([]);
+const GamesGrid = () => {
+  const [games, setGames] = useState([]);
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const getCars = async () => {
+    const getGames = async () => {
       const token = localStorage.getItem("token"); // Pobierz token z localStorage
       try {
-        const res = await fetch(BASE_URL+"/api/cars", {
+        const res = await fetch(BASE_URL+"/api/games", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`, // Dodaj token do nagłówka
@@ -25,23 +25,23 @@ const CarsGrid = () => {
         const data = await res.json();
 
         if (!res.ok) {
-          throw new Error(data.error || "Failed to fetch cars");
+          throw new Error(data.error || "Failed to fetch games");
         }
-        setCars(data);
+        setGames(data);
       } catch (error) {
-        console.error("Error fetching cars:", error.message);
+        console.error("Error fetching games:", error.message);
         setError(error.message);
       } finally {
         setIsLoading(false);
       }
     };
 
-    getCars();
+    getGames();
   }, []);
-console.log(cars);
+console.log(games);
     return (
         <Container maxW="container.xl">
-            <Navbar setCars={setCars} cars={cars}/>
+            <Navbar setGames={setGames} games={games} users={users}/>
             <Flex direction="column" align="center" mt={5}>
                 <Grid
                     templateColumns={{
@@ -51,11 +51,11 @@ console.log(cars);
                     }}
                     gap={6}
                 >
-                    {cars.map((car) => {
-                        // Find the user associated with the car
-                        const user = users.find(user => user.id === car.owner_id);
+                    {games.map((game) => {
+                        // Find the user associated with the game
+                        const user = users.find(user => user.id === game.owner_id);
                         return (
-                            <CarCard key={car.id} car={car} setCars={setCars} user={user} />
+                            <GameCard key={game.id} game={game} setGames={setGames} user={user} />
                         );
                     })}
                     </Grid>
@@ -64,13 +64,13 @@ console.log(cars);
                             <Spinner size={"xl"} />
                         </Flex>
                     )}
-                    {!isLoading && cars.length === 0 && (
+                    {!isLoading && games.length === 0 && (
                         <Flex justifyContent={"center"}>
                             <Text fontsize={"xl"}>
                                 <Text as={"span"} fontSize={"2xl"} fontWeight={"bold"} >
                                     Poor you! 🙁
                                 </Text>
-                                No car found.
+                                No game found.
                             </Text>
                             
                         </Flex>
@@ -81,4 +81,4 @@ console.log(cars);
     );
 };
 
-export default CarsGrid;
+export default GamesGrid;

@@ -3,6 +3,7 @@ import { Field } from "./ui/field";
 import { useNavigate } from "react-router-dom";
 import { PasswordInput } from "./ui/password-input";
 import { useState } from "react";
+import {useColorModeValue} from "./ui/color-mode.jsx";
 
 const LoginPage = () => {
   const [username, setUsername] = useState(""); // Stan dla nazwy użytkownika
@@ -23,7 +24,7 @@ const LoginPage = () => {
         const data = await response.json();
         localStorage.setItem("token", data.access_token);
         console.log(data.access_token)
-        navigate("/cars");
+        navigate("/games");
       } else {
         alert("Nieprawidłowe dane logowania");
       }
@@ -39,7 +40,7 @@ const LoginPage = () => {
       justifyContent="center"
       alignItems="center"
     >
-      <Card.Root width={{ base: "80vw", md: "70vw" }}>
+      <Card.Root width={{ base: "80vw", md: "70vw" }} shadow={"2lg"} bg={useColorModeValue("gray.700", "gray.750")} color={"white"}>
         {/* Główna karta logowania */}
         <Card.Header>
           <Text
@@ -49,11 +50,10 @@ const LoginPage = () => {
           >
             Login
           </Text>
-          <Card.Description>
+          <Card.Description color={"white"}>
             Uzupełnij formularz, aby się zalogować.
           </Card.Description>
         </Card.Header>
-        {/* Formularz logowania */}
         <form onSubmit={handleLogin}>
           <Card.Body>
             <Stack gap="4" w="full">

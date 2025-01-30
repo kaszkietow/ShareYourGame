@@ -21,36 +21,40 @@ import {BASE_URL} from "./GamesGrid.jsx";
 import {toaster} from "./ui/toaster.jsx";
 import {RadioCardItem, RadioCardLabel, RadioCardRoot} from "./ui/radio-card.jsx";
 import {NumberInputField, NumberInputRoot} from "./ui/number-input.jsx";
+import {NativeSelectField, NativeSelectRoot} from "./ui/native-select.jsx";
+import {useColorModeValue} from "./ui/color-mode.jsx";
 
-const EditCar = ({setCars, car}) => {
+const EditGame = ({setGames, game}) => {
   const[isOpen, setIsOpen] = useState(false);
   const[isLoading, setIsLoading] = useState(false);
-  const [price, setPrice] = useState("100")
+  const [price_per_day, setPrice_per_day] = useState("5")
   const[inputs, setInputs] = useState({
-        model: car.model,
-        description: car.description,
-        available: car.available,
-        img_url: car.img_url,
+        title: game.title,
+        description: game.description,
+        available: game.available,
+        img_url: game.img_url,
+        genre: game.genre,
+        condition: game.condition,
     });
-  const handleEditCar =  async (e) => {
+  const handleEditGame =  async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    const carData = { ...inputs, price};
+    const gameData = { ...inputs, price_per_day};
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(BASE_URL + "/api/cars/" + car.id, {
+      const res = await fetch(BASE_URL + "/api/games/" + game.id, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(carData),
+        body: JSON.stringify(gameData),
       })
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.error)
       }
-      setCars((prevCars) => prevCars.map((c) => c.id === car.id ? data : c));
+      setGames((prevGames) => prevGames.map((c) => c.id === game.id ? data : c));
       toaster.success({
         title: "Sukcess🎉",
         description: "Pomyślnie zaktualizowano dane.",
@@ -75,65 +79,137 @@ const EditCar = ({setCars, car}) => {
             <FaRegEdit/>
           </Button>
         </DialogTrigger>
-        <DialogContent>
-          <form onSubmit={handleEditCar}>
+        <DialogContent bg={useColorModeValue("teal.900", "gray.950")} color={"white"}>
+          <form onSubmit={handleEditGame}>
             <DialogHeader>
-              <DialogTitle>Edytuj swoją maszynę 🚜</DialogTitle>
+              <DialogTitle>Edytuj swoją gierkę 🎮🎮🎮</DialogTitle>
             </DialogHeader>
             <DialogBody pb="4">
-              <Stack gap="4">
-                <Field label="Model">
-                  <Input
-                      placeholder="BMW M3 CS"
-                      value={inputs.model}
-                      onChange={(e) => setInputs((prev) => ({...prev, model: e.target.value}))}
-                  />
-                </Field>
-                <Field label="Description">
-                  <Input
-                      placeholder="Pocisk jakich mało."
-                      value={inputs.description}
-                      onChange={(e) => setInputs((prev) => ({...prev, description: e.target.value}))}
-                  />
-                </Field>
-                <Stack>
-                <RadioCardRoot defaultValue="next">
-                  <RadioCardLabel>Avability</RadioCardLabel>
-                          <HStack align="stretch">
+            <Stack gap="4">
+              <Field label="Title">
+                <Input
+                    placeholder="Uncharted 3"
+                    value={inputs.title}
+                    onChange={(e) =>
+                        setInputs({...inputs, title: e.target.value})
+                    }
+                />
+              </Field>
+              <Stack>
+              <RadioCardRoot >
+                <RadioCardLabel>Platform</RadioCardLabel>
+                        <HStack align="stretch">
+                        <RadioCardItem
+                          label={"PS3"}
+                          value={'PS3'}
+                          onChange={(e) =>
+                            setInputs({...inputs, platform: e.target.value})
+                          }/>
+                        <RadioCardItem
+                          label={"PS4"}
+                          value={'PS4'}
+                          onChange={(e) =>
+                            setInputs({...inputs, platform: e.target.value})
+                          }/>
+                        <RadioCardItem
+                          label={"PS5"}
+                          value={'PS5'}
+                          onChange={(e) =>
+                            setInputs({...inputs, platform: e.target.value})
+                          }/>
                           <RadioCardItem
-                            label={"Not Available"}
-                            value={'false'}
-                                onChange={(e) => setInputs((prev) => ({...prev, available: e.target.value}))}>
-                          </RadioCardItem>
-
-                          <RadioCardItem
-                              label={"Available"}
-                            value={'true'}
-                            onChange={(e) => setInputs((prev) => ({...prev, available: e.target.value}))}>
-                          </RadioCardItem>
-                  </HStack>
-                </RadioCardRoot>
-                </Stack>
-                <Field label="Price" >
-                  <NumberInputRoot
-                      min={10} max={1000}
-                      value={price}
-                      onValueChange={(e) => setPrice(e.value)}
-                  >
-                    <NumberInputField/>
-                  </NumberInputRoot>
-                </Field>
-                <Field label="Image">
-                  <Textarea
-                      overflow={"hidden"}
-                      resize={"none"}
-                      placeholder="Link"
-                      value={inputs.img_url}
-                      onChange={(e) => setInputs((prev) => ({...prev, img_url: e.target.value}))}
-                  />
-                </Field>
+                          label={"PC"}
+                          value={'PC'}
+                          onChange={(e) =>
+                            setInputs({...inputs, platform: e.target.value})
+                          }/>
+                </HStack>
+              </RadioCardRoot>
               </Stack>
-            </DialogBody>
+              <Field label={"Genre"}>
+                <NativeSelectRoot size="md" >
+                  <NativeSelectField
+                      placeholder="Select genre"
+                      bg={useColorModeValue("teal.900", "gray.950")}
+                      value={inputs.genre}
+                      onChange={(e) => setInputs({...inputs, genre: e.currentTarget.value})}
+                  >
+                    <option value="action">Action</option>
+                    <option value="adventure">Adventure</option>
+                    <option value="role-playing">Role-playing</option>
+                    <option value="simulation">Simulation</option>
+                    <option value="strategy">Strategy</option>
+                    <option value="sports">Sports</option>
+                  </NativeSelectField>
+                </NativeSelectRoot>
+              </Field>
+              <Field label={"Condition"}>
+                <NativeSelectRoot size="md" >
+                  <NativeSelectField
+                      placeholder="Select genre"
+                      bg={useColorModeValue("teal.900", "gray.950")}
+                      value={inputs.condition}
+                      onChange={(e) => setInputs({...inputs, condition: e.currentTarget.value})}
+                  >
+                    <option value="new">New</option>
+                    <option value="used">Used</option>
+                    <option value="damaged">Damaged</option>
+                  </NativeSelectField>
+                </NativeSelectRoot>
+              </Field>
+              <Stack>
+              <RadioCardRoot >
+                <RadioCardLabel>Avability</RadioCardLabel>
+                        <HStack align="stretch">
+                        <RadioCardItem
+                          label={"Not Available"}
+                          value={'false'}
+                          onChange={(e) =>
+                            setInputs({...inputs, available: e.target.value})
+                          }>
+                        </RadioCardItem>
+
+                        <RadioCardItem
+                          label={"Available"}
+                          value={'true'}
+                          onChange={(e) =>
+                            setInputs({...inputs, available: e.target.value})
+                          }>
+                        </RadioCardItem>
+                </HStack>
+              </RadioCardRoot>
+              </Stack>
+              <Field label="Price per day" >
+                <NumberInputRoot
+                    value={price_per_day}
+                    onValueChange={(e) => setPrice_per_day(e.value)}>
+                  <NumberInputField/>
+                </NumberInputRoot>
+              </Field>
+              <Field label="Image URL" >
+                <Textarea
+                    overflow={"hidden"}
+                    resize={"none"}
+                    placeholder="Image link"
+                    value={inputs.img_url}
+                    onChange={(e) =>
+                        setInputs({...inputs, img_url: e.target.value})
+                    }
+                />
+              </Field>
+              <Field label="Description">
+                <Textarea
+                    placeholder="Great and beautifull game."
+                    overflow={"hidden"}
+                    resize={"none"}
+                    value={inputs.description}
+                    onChange={(e) =>
+                        setInputs({...inputs, description: e.target.value})
+                    }
+                />
+              </Field>
+            </Stack>
+          </DialogBody>
             <DialogFooter>
               <Button variant="outline" colorPalette={"teal"} type='submit' isLoading={isLoading}>UPDATE</Button>
               <Button onClick={(e) => setIsOpen(false)}>CANCEL</Button>
@@ -143,4 +219,4 @@ const EditCar = ({setCars, car}) => {
 </DialogRoot>
   )
 };
-export default EditCar;
+export default EditGame;

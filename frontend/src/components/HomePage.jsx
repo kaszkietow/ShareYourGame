@@ -2,6 +2,7 @@ import {Box, Container, Grid, Stack} from "@chakra-ui/react";
 import CardLogin from "./CardLogin.jsx";
 import CardRegister from "./CardRegister.jsx";
 import Navbar from "./Navbar.jsx";
+import {useColorModeValue} from "./ui/color-mode.jsx";
 
 const HomePage = () => {
     return (
@@ -15,7 +16,7 @@ const HomePage = () => {
                     }}
                     gap={2}
                 >
-                    <CardLogin/>
+                    <CardLogin />
                     <CardRegister/>
                 </Grid>
 

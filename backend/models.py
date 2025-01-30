@@ -1,88 +1,108 @@
 from app import db
+from datetime import datetime, timedelta
+
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(50), nullable=False)
-    img_url = db.Column(db.String(200), nullable=False)
     gender = db.Column(db.String(10), nullable=False)
-    cars = db.relationship('Car', backref='owner', lazy=True)
-    reservations = db.relationship('Reservation', backref='user', lazy=True) # Relacja z rezerwacjami
+    img_url = db.Column(db.String(200), nullable=False)
+    location = db.Column(db.String(100), nullable=False)
+    games = db.relationship('Game', backref='owner', lazy=True)
+    rentals = db.relationship('Rental', backref='renter', lazy=True)
+    payments = db.relationship('Payment', backref='payer', lazy=True)
 
     def to_json_user(self):
         return {
             "id": self.id,
             "username": self.username,
-            "imgUrl": self.img_url,
+            "password": self.password,
             "gender": self.gender,
-            "cars": [car.to_json_car() for car in self.cars],
-            "reservations": [reservation.to_json_reservation() for reservation in self.reservations],
+            "imgUrl": self.img_url,
+            "location": self.location,
+            "games": [game.to_json_game() for game in self.games],
+            "rentals": [rental.to_json_rental() for rental in self.rentals],
         }
 
-class Car(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    model = db.Column(db.String(80), nullable=False)
-    description = db.Column(db.String(200), nullable=False)
-    available = db.Column(db.String(10), nullable=False)
-    img_url = db.Column(db.String(200), nullable=False)
-    price = db.Column(db.Integer, nullable=False)
-    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    reservations = db.relationship('Reservation', backref='car', lazy=True) # Relacja z rezerwacjami
 
-    def to_json_car_with_owner(self):
+class Game(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    platform = db.Column(db.String(10), nullable=False)
+    genre = db.Column(db.String(50), nullable=False)
+    condition = db.Column(db.String(20), nullable=False)
+    img_url = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    price_per_day = db.Column(db.Float, nullable=False)
+    available = db.Column(db.String(10), default=True)
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    rentals = db.relationship('Rental', backref='game', lazy=True)
+
+    def to_json_game(self):
         return {
             "id": self.id,
-            "model": self.model,
-            "description": self.description,
-            "available": self.available,
+            "title": self.title,
+            "platform": self.platform,
+            "genre": self.genre,
+            "condition": self.condition,
             "imgUrl": self.img_url,
-            "price": self.price,
+            "description": self.description,
+            "price_per_day": self.price_per_day,
+            "available": self.available
+        }
+
+    def to_json_game_with_owner(self):
+        return {
+            **self.to_json_game(),
             "owner": {
-                "id": self.owner_id,
+                "id": self.owner.id,
                 "username": self.owner.username,
                 "imgUrl": self.owner.img_url,
-            },
-            "reservations": [reservation.to_json_reservation() for reservation in self.reservations],
+            }
         }
 
-    def to_json_car(self):
-        return {
-            "id": self.id,
-            "model": self.model,
-            "description": self.description,
-            "available": self.available,
-            "imgUrl": self.img_url,
-            "price": self.price,
-        }
 
-class Reservation(db.Model):
+class Rental(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    car_id = db.Column(db.Integer, db.ForeignKey('car.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    reservation_date = db.Column(db.DateTime, nullable=False)
-    return_date = db.Column(db.DateTime, nullable=False)
-    payment = db.relationship('Payment', backref='reservation', lazy=True) # Relacja z płatnościami
+    game_id = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)
+    renter_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    start_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    end_date = db.Column(db.DateTime, nullable=False)
+    total_price = db.Column(db.Float, nullable=False)
+    status = db.Column(db.String(20), default="pending")  # pending, active, completed, cancelled
+    payment = db.relationship('Payment', backref='rental', lazy=True, uselist=False)
 
-    def to_json_reservation(self):
+    def to_json_rental(self):
         return {
             "id": self.id,
-            "car_id": self.car_id,
-            "user_id": self.user_id,
-            "reservation_date": self.reservation_date,
-            "return_date": self.return_date,
-            "payment": [payment.to_json_payment() for payment in self.payment],
+            "game": self.game.to_json_game(),
+            "renter": {
+                "id": self.renter.id,
+                "username": self.renter.username
+            },
+            "start_date": self.start_date,
+            "end_date": self.end_date,
+            "total_price": self.total_price,
+            "status": self.status,
+            "payment": self.payment.to_json_payment() if self.payment else None
         }
+
 
 class Payment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    reservation_id = db.Column(db.Integer, db.ForeignKey('reservation.id'), nullable=False)
-    amount = db.Column(db.Integer, nullable=False)
-    status = db.Column(db.String(20), nullable=False)
+    rental_id = db.Column(db.Integer, db.ForeignKey('rental.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    status = db.Column(db.String(20), default="pending")  # pending, completed, failed
+    payment_date = db.Column(db.DateTime, default=datetime.utcnow)
 
     def to_json_payment(self):
         return {
             "id": self.id,
-            "reservation_id": self.reservation_id,
+            "rental_id": self.rental_id,
+            "user_id": self.user_id,
             "amount": self.amount,
             "status": self.status,
+            "payment_date": self.payment_date,
         }
