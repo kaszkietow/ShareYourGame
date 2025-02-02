@@ -86,7 +86,7 @@ const RegisterPage = () => {
             left="0"
           >
         <Flex
-            height="95vh"
+            height="100vh"
             justifyContent="center"
             alignItems="center"
             shadow={"xl"}
